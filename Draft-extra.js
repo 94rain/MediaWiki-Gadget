@@ -2,17 +2,6 @@
  extra.js --- by Evad37
  > Common helper functions, stored in the window.extraJs object.
  > Version 2.1.5
-----------------------------------------------------------------------------------------------------
- Take care to load approriate resource loader modules, as specified for each function. Or just load
- all that may be required, like this:
- 
- mw.loader.using( ['mediawiki.util', 'mediawiki.api', 'mediawiki.Title', 'mediawiki.RegExp',
-	'oojs-ui-core', 'oojs-ui-widgets', 'oojs-ui-windows'], function () {
-
- // ... your code goes here...
-
- });
- 
 ***************************************************************************************************/
 // <nowiki>
 
@@ -35,13 +24,13 @@ window.extraJs = { version: '2.1.5' };
 extraJs.makeErrorMsg = function(code, jqxhr) {
 	var details = '';
 	if ( code === 'http' && jqxhr.textStatus === 'error' ) {
-		details = 'HTTP error ' + jqxhr.xhr.status;
+		details = 'HTTP错误' + jqxhr.xhr.status;
 	} else if ( code === 'http' ) {
-		details = 'HTTP error: ' + jqxhr.textStatus;
+		details = 'HTTP错误: ' + jqxhr.textStatus;
 	} else if ( code === 'ok-but-empty' ) {
-		details = 'Error: Got an empty response from the server';
+		details = '错误：来自服务器的响应为空';
 	} else {
-		details = 'API error: ' + code;
+		details = 'API错误：' + code;
 	}
 	return details;
 };
@@ -63,7 +52,7 @@ extraJs.makeLink = function(linktarget, linktext) {
 		linktext = linktarget;
 	}
 	return $('<a>').attr({
-		'href':'https://en.wikipedia.org/wiki/'+mw.util.wikiUrlencode(linktarget),
+		'href':'https://zh.wikipedia.org/wiki/'+mw.util.wikiUrlencode(linktarget),
 		'target':'_blank'
 	}).text(linktext);
 };
