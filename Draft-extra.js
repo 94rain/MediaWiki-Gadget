@@ -1,11 +1,22 @@
-/***************************************************************************************************
+﻿/***************************************************************************************************
  extra.js --- by Evad37
  > Common helper functions, stored in the window.extraJs object.
- > Version 2.1.5
+ > Version 2.1.6
+----------------------------------------------------------------------------------------------------
+ Take care to load approriate resource loader modules, as specified for each function. Or just load
+ all that may be required, like this:
+ 
+ mw.loader.using( ['mediawiki.util', 'mediawiki.api', 'mediawiki.Title',
+	'oojs-ui-core', 'oojs-ui-widgets', 'oojs-ui-windows'], function () {
+
+ // ... your code goes here...
+
+ });
+ 
 ***************************************************************************************************/
 // <nowiki>
 
-window.extraJs = { version: '2.1.5' };
+window.extraJs = { version: '2.1.6' };
 
 /**
  * makeApiErrorMsg
@@ -24,13 +35,13 @@ window.extraJs = { version: '2.1.5' };
 extraJs.makeErrorMsg = function(code, jqxhr) {
 	var details = '';
 	if ( code === 'http' && jqxhr.textStatus === 'error' ) {
-		details = 'HTTP错误' + jqxhr.xhr.status;
+		details = 'HTTP error ' + jqxhr.xhr.status;
 	} else if ( code === 'http' ) {
-		details = 'HTTP错误: ' + jqxhr.textStatus;
+		details = 'HTTP error: ' + jqxhr.textStatus;
 	} else if ( code === 'ok-but-empty' ) {
-		details = '错误：来自服务器的响应为空';
+		details = 'Error: Got an empty response from the server';
 	} else {
-		details = 'API错误：' + code;
+		details = 'API error: ' + code;
 	}
 	return details;
 };
@@ -52,7 +63,7 @@ extraJs.makeLink = function(linktarget, linktext) {
 		linktext = linktarget;
 	}
 	return $('<a>').attr({
-		'href':'https://zh.wikipedia.org/wiki/'+mw.util.wikiUrlencode(linktarget),
+		'href':'https://en.wikipedia.org/wiki/'+mw.util.wikiUrlencode(linktarget),
 		'target':'_blank'
 	}).text(linktext);
 };
@@ -433,7 +444,7 @@ extraJs.uniqueArray = function(a) {
  * Function to unlink and/or remove links and file usages from a block of wikitext.
  * Derived from XFDcloser < https://en.wikipedia.org/wiki/User:Evad37/XFDcloser.js >
  *
- * @requires {Module} mediawiki.RegExp, User:SD0001/parseTemplate.js
+ * @requires {Module} mediawiki.util, User:SD0001/parseTemplate.js
  * @param {string} wikitext
  *  Wikitext in which to search for links or file usages.
  * @param {string[]} unlinkThese
@@ -458,9 +469,9 @@ extraJs.unlink = function(wikitext, unlinkThese, ns, isDab) {
 			filename = unlinkFiles[i].replace(/^.*?:/, "");
 			// For regex matching: first character can be either upper or lower case, special
 			// characters need to be escaped, spaces/underscores can be either spaces or underscores
-			filename_regex_str = "[" + mw.RegExp.escape(filename.slice(0, 1).toUpperCase()) +
-			mw.RegExp.escape(filename.slice(0, 1).toLowerCase()) + "]" +
-			mw.RegExp.escape(filename.slice(1)).replace(/(?: |_)/g, "[ _]");
+			filename_regex_str = "[" + mw.util.escapeRegExp(filename.slice(0, 1).toUpperCase()) +
+			mw.util.escapeRegExp(filename.slice(0, 1).toLowerCase()) + "]" +
+			mw.util.escapeRegExp(filename.slice(1)).replace(/(?: |_)/g, "[ _]");
 			// Add to regex strings
 			normal_regex_str += "\\[\\[\\s*(?:[Ii]mage|[Ff]ile)\\s*:\\s*" + filename_regex_str +
 			"\\s*\\|?.*?(?:(?:\\[\\[.*?\\]\\]).*?)*\\]\\]";
@@ -504,9 +515,9 @@ extraJs.unlink = function(wikitext, unlinkThese, ns, isDab) {
 				portalname = portal.replace("Portal:", "");
 				// For regex matching: first character can be either upper or lower case, special
 				// characters need to be escaped, spaces/underscores can be either spaces or underscores
-				return "[" + mw.RegExp.escape(portalname.slice(0, 1).toUpperCase()) +
-					mw.RegExp.escape(portalname.slice(0, 1).toLowerCase()) + "]" +
-					mw.RegExp.escape(portalname.slice(1)).replace(/(?: |_)/g, "[ _]");
+				return "[" + mw.util.escapeRegExp(portalname.slice(0, 1).toUpperCase()) +
+					mw.util.escapeRegExp(portalname.slice(0, 1).toLowerCase()) + "]" +
+					mw.util.escapeRegExp(portalname.slice(1)).replace(/(?: |_)/g, "[ _]");
 			}).join('|') +
 			")(?![^<]*?-->)"; // Close off regex string
 		var portal_regex = new RegExp(portal_regex_str);
@@ -560,12 +571,12 @@ extraJs.unlink = function(wikitext, unlinkThese, ns, isDab) {
 					// Remove template wikitext, including any preceding * or : characters:
 					// - if on it's own line, remove a linebreak
 					wikitext = wikitext.replace(
-						new RegExp('\\n[\\*\\:]*[\\t ]*' + mw.RegExp.escape(template.wikitext) + '\\n'),
+						new RegExp('\\n[\\*\\:]*[\\t ]*' + mw.util.escapeRegExp(template.wikitext) + '\\n'),
 						'\n'
 					)
 					// - if something else is on the line, leave the linebreaks alone
 					.replace(
-						new RegExp('[\\*\\:]*[\\t ]*' + mw.RegExp.escape(template.wikitext)),
+						new RegExp('[\\*\\:]*[\\t ]*' + mw.util.escapeRegExp(template.wikitext)),
 						''
 					);
 				}
@@ -610,9 +621,9 @@ extraJs.unlink = function(wikitext, unlinkThese, ns, isDab) {
 	for ( var ii=0; ii<unlinkThese.length; ii++ ) {
 		// For regex matching: first character can be either upper or lower case, special
 		// characters need to be escaped, spaces/underscores can be either spaces or underscores
-		var unlink_regex_str = "[" + mw.RegExp.escape(unlinkThese[ii].slice(0, 1).toUpperCase()) +
-			mw.RegExp.escape(unlinkThese[ii].slice(0, 1).toLowerCase()) + "]" +
-			mw.RegExp.escape(unlinkThese[ii].slice(1)).replace(/(?: |_)/g, "[ _]");
+		var unlink_regex_str = "[" + mw.util.escapeRegExp(unlinkThese[ii].slice(0, 1).toUpperCase()) +
+			mw.util.escapeRegExp(unlinkThese[ii].slice(0, 1).toLowerCase()) + "]" +
+			mw.util.escapeRegExp(unlinkThese[ii].slice(1)).replace(/(?: |_)/g, "[ _]");
 		// Add to regex strings
 		simple_regex_str += unlink_regex_str;
 		named_regex_str += unlink_regex_str;
