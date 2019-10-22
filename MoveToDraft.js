@@ -794,15 +794,15 @@ var screen2 = function() {
 	$("#M2D-interface-content").append(
 		$('<ul>').attr('id', 'M2D-tasks').css("color", "#888").append(
 			$('<li>').attr('id', 'M2D-task0').append(
-				'Moving page... ',
+				'移动页面... ',
 				$('<span>').attr('id','M2D-status0').text('等待中')
 			),
 			$('<li>').attr('id', 'M2D-task1').append(
-				'Checking images... ',
+				'检查图片... ',
 				$('<span>').attr('id','M2D-status1').text('等待中')
 			),	
 			$('<li>').attr('id', 'M2D-task2').append(
-				'Editing page wikitext... ',
+				'编辑页面维基文本... ',
 				$('<span>').attr('id','M2D-status2').text('等待中')
 			),
 			config.inputdata.notifyEnable ?
