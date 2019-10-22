@@ -1,7 +1,7 @@
 ﻿/***************************************************************************************************
  MoveToDraft
 -------------
-Version 2.4.3
+Version 2.4.2
 -------------
 A script to move unsourced articles to draft space, including cleanup and author notification.
 - Moves page to draftspace
@@ -24,7 +24,7 @@ $.when(
 var config = {	
 	// Script info
 	script: {
-		advert:  ' ([[User:Evad37/MoveToDraft.js|via script]])', // For edit summaries
+		advert:  ' ([[User:94rain/js/MoveToDraft|移动至草稿脚本]])', // For edit summaries
 		version: '2.4.3'
 	},
 	// MediaWiki configuration values
@@ -45,7 +45,7 @@ var API = new mw.Api( {
 	ajax: {
 		headers: { 
 			'Api-User-Agent': 'MoveToDraft/' + config.script.version + 
-				' ( https://en.wikipedia.org/wiki/User:Evad37/MoveToDraft )'
+				' ( https://zh.wikipedia.org/wiki/User:94rain/js/MoveToDraft )'
 		}
 	}
 } );
@@ -55,11 +55,11 @@ var moveToDraft = function moveToDraft() {
 /* ========== Additional config ================================================================= */
 // Wikitext strings
 config.wikitext = {
-	'rationale':	window.m2d_rationale || 'Undersourced, incubate in draftspace',
-	'editsummary':	window.m2d_editsummary || window.m2d_rationale || '[[WP:AFC|AFC]] draft',
-	'notification_heading': '[[Draft:$1|$1]] moved to draftspace',
-	'notification':	window.m2d_notification || "An article you recently created, [[Draft:$1|$1]], does not have enough sources and citations as written to remain published. It needs more citations from [[WP:RS|reliable]], [[WP:IS|independent sources]]. <small>([[WP:42|?]])</small> Information that can't be referenced should be removed ([[WP:V|verifiability]] is of [[WP:5|central importance]] on Wikipedia). I've moved your draft to [[Wikipedia:Draftspace|draftspace]] (with a prefix of \"<code>Draft:</code>\" before the article title) where you can incubate the article with minimal disruption. When you feel the article meets Wikipedia's [[WP:GNG|general notability guideline]] and thus is ready for mainspace, please click on the \"Submit your draft for review!\" button at the top of the page. ~~~~",
-	'logMsg':		'#[[$1]] moved to [[$2]] at ~~~~~'
+	'rationale':	window.m2d_rationale || '无来源或内容短小，在草稿空间改善',
+	'editsummary':	window.m2d_editsummary || window.m2d_rationale || '[[:WP:AFC|建立条目]]草稿',
+	'notification_heading': '通知：[[:Draft:$1|$1]]移动至草稿空间',
+	'notification':	window.m2d_notification || "您最近创建的条目[[:Draft:$1|$1]]没有足够的[[:WP:V|来源]]和[[:Help:脚注|脚注]]，或者还未完成。维基百科的条目需要[[WP:RS|可靠来源]]来彰显其有足够的关注度。因此，我已经将它移动到了草稿（在条目名前有一个\"<code>Draft:</code>\"前缀）)。您可以慢慢改善它，若您认为它满足[[:WP:GNG|通用关注度指引]]并且可以成为一篇维基百科的条目时，请点击页面顶部的\"提交草稿\"以待有经验的编者审核并将其移动到条目空间。--~~~~",
+	'logMsg':		'#[[:$1]]移动至[[$2]]，于~~~~~'
 };
 config.doNotLog = window.m2d_doNotLog ? true : false;
 // Page data -- to be retreived later from api
@@ -83,16 +83,13 @@ var getPageText = function(p) {
 var grabPageData = function() {
 	
 	var patt_isRedirect = /^\s*#redirect/i;
-	
-	var checkedPageTriageStatus = false;
-	
+		
 	// Function to check if all done
 	var checkPageData = function() {
 		if (
 			config.pagedata.author != null &&
 			config.pagedata.oldwikitext != null &&
-			config.pagedata.redirects != null &&
-			checkedPageTriageStatus
+			config.pagedata.redirects != null
 		) {
 			//all done - go to next screen
 			screen1();
@@ -116,7 +113,7 @@ var grabPageData = function() {
 		//Check that we actually found an author (i.e. not all revisions were redirects
 		if ( config.pagedata.author == null ) {
 			API.abort();
-			var retry = confirm("Could not retrieve page author:\n"+extraJs.makeErrorMsg(c, r)+"\n\nTry again?");
+			var retry = confirm("无法获取页面创建者：\n"+extraJs.makeErrorMsg(c, r)+"\n\n重试？");
 			if ( retry ) {
 				screen0();
 			} else {
@@ -131,7 +128,7 @@ var grabPageData = function() {
 		// Check if page is currently a redirect
 		if ( result.query.pages[config.mw.wgArticleId].redirect ) {
 			API.abort();
-			alert("Error: " + config.mw.wgPageName + " is a redirect");
+			alert("错误：" + config.mw.wgPageName + "是一个重定向");
 			return;
 		}
 		// Check if first revision is a redirect
@@ -151,7 +148,7 @@ var grabPageData = function() {
 				if ( r.textStatus === 'abort' ) { return; }
 				
 				API.abort();
-				var retry = confirm("Could not retrieve page author:\n"+extraJs.makeErrorMsg(c, r)+"\n\nTry again?");
+				var retry = confirm("无法获取页面创建者：\n"+extraJs.makeErrorMsg(c, r)+"\n\n重试？");
 				if ( retry ) {
 					screen0();
 				} else {
@@ -179,7 +176,7 @@ var grabPageData = function() {
 		if ( r.textStatus === 'abort' ) { return; }
 		
 		API.abort();
-		var retry = confirm("Could not retrieve page author:\n"+extraJs.makeErrorMsg(c, r)+"\n\nTry again?");
+		var retry = confirm("无法获取页面创建者：\n"+extraJs.makeErrorMsg(c, r)+"\n\n重试？");
 		if ( retry ) {
 			screen0();
 		} else {
@@ -203,7 +200,7 @@ var grabPageData = function() {
 		if ( r.textStatus === 'abort' ) { return; }
 		
 		API.abort();
-		var retry = confirm("Could not retrieve page wikitext:\n"+ extraJs.makeErrorMsg(c, r)+"\n\nTry again?");
+		var retry = confirm("无法获取页面维基文本：\n"+ extraJs.makeErrorMsg(c, r)+"\n\n重试？");
 		if ( retry ) {
 			screen0();
 		} else {
@@ -258,8 +255,8 @@ var grabPageData = function() {
 			if ( r.textStatus === 'abort' ) { return; }
 			
 			API.abort();
-			var retry = confirm("Could not retrieve redirects:\n" + extraJs.makeErrorMsg(c, r) +
-				"\n\nTry again? (or Cancel to skip)");
+			var retry = confirm("无法获取重定向：\n" + extraJs.makeErrorMsg(c, r) +
+				"\n\n重试？（或取消以跳过）");
 			if ( retry ) {
 				screen0();
 			} else {
@@ -272,36 +269,7 @@ var grabPageData = function() {
 	
 	/* ---------- Review (Page Triage) status ----------------------------------------------------------------- */
 
-	API.get( {
-		action: 'pagetriagelist',
-		page_id: config.mw.wgArticleId
-	} )
-	.done( function(result) {
-		if ( !result.pagetriagelist.pages.length ) {
-			var keepGoing = confirm('WARNING: Page has already been reviewed by a New Page Patroller. Are you sure you want to draftify this page?');
-			if ( !keepGoing ) {
-				API.abort();
-				$("#M2D-modal").remove();
-				return;
-			}
-		}
-		checkedPageTriageStatus = true;
-		checkPageData();
-	} )
-	.fail( function(c,r) {
-		if ( r.textStatus === 'abort' ) { return; }
-		
-		API.abort();
-		var retry = confirm("Could not retrieve page triage status:\n"+ extraJs.makeErrorMsg(c, r)+"\n\nTry again?");
-		if ( retry ) {
-			screen0();
-		} else {
-			$("#M2D-modal").remove();
-		}
-	} );	
-	
-};
-
+	checkPageData();
 //Move page
 var movePage = function() {
 	$("#M2D-task0").css({"color":"#00F", "font-weight":"bold"});
@@ -318,20 +286,21 @@ var movePage = function() {
 	.done( function() {
 		if (
 			-1 === $.inArray('sysop', config.mw.wgUserGroups) &&
-			-1 === $.inArray('extendedmover', config.mw.wgUserGroups)
+			-1 === $.inArray('rollbacker', config.mw.wgUserGroups)
+			-1 === $.inArray('patroller', config.mw.wgUserGroups)
 		) {
 			// Newly created redirect to be tagged for speedy deletion
 			tagRedrect();
 			return;
 		}
 		$("#M2D-task0").css({"color":"#000", "font-weight":""});
-		$("#M2D-status0").html("Done!");			
+		$("#M2D-status0").html("完成！");			
 		getImageInfo();
 	} )
 	.fail( function(c,r) {
 		if ( r.textStatus === 'abort' ) { return; }
 		
-		var retry = confirm("Could not move page:\n"+ extraJs.makeErrorMsg(c, r)+"\n\nTry again?");
+		var retry = confirm("无法移动页面：\n"+ extraJs.makeErrorMsg(c, r)+"\n\n重试？");
 		if ( retry ) {
 			movePage();
 		} else {
@@ -341,28 +310,28 @@ var movePage = function() {
 };
 
 var tagRedrect = function() {
-	$("#M2D-status0").html("Done,<br/>Tagging redirect for speedy deletion...");	
+	$("#M2D-status0").html("完成。<br/>标记重定向快速删除...");	
 	API.postWithToken( 'csrf', {
 		action: 'edit',
 		title: config.mw.wgPageName,
-		prependtext: '{{Db-r2}}\n',
-		summary: '[[WP:R2|R2]] speedy deletion request (article moved to draftspace)' + config.script.advert
+		prependtext: '{{d|R2}}\n',
+		summary: '请求快速删除（[[WP:R2|CSD R2]]）' + config.script.advert
 	} )
 	.done( function() {
 		$("#M2D-task0").css({"color":"#000", "font-weight":""});
-		$("#M2D-status0").append(" Done!");			
+		$("#M2D-status0").append("完成！");			
 		getImageInfo();
 	} )
 	.fail( function(c,r) {
 		if ( r.textStatus === 'abort' ) { return; }
 		
-		var retry = confirm("Could not tag redirect for speedy deletion:\n"+
-			extraJs.makeErrorMsg(c, r) + "\n\nTry again?");
+		var retry = confirm("无法将重定向标记快速删除：\n"+
+			extraJs.makeErrorMsg(c, r) + "\n\n重试？");
 		if ( retry ) {
 			tagRedrect();
 		} else {
 			$("#M2D-task0").css({"color":"#F00", "font-weight":""});
-			$("#M2D-status0").append(" Skipped");
+			$("#M2D-status0").append("已跳过");
 			getImageInfo();
 		}
 	} );
@@ -392,22 +361,22 @@ var getImageInfo = function() {
 		gimlimit: 'max',
 		prop: 'categories',
 		cllimit: 'max',
-		clcategories: 'Category:All non-free media',
+		clcategories: 'Category:非自由媒体',
 	} )
 	.done( function(result){
 		$("#M2D-task1").css({"color":"#000", "font-weight":""});
-		$("#M2D-status1").html("Done!");
+		$("#M2D-status1").html("完成！");
 		processImageInfo(result);
 	} )
 	.fail( function(c,r) {
 		if ( r.textStatus === 'abort' ) { return; }
 		
-		var retry = confirm("Could not find if there are non-free files:\n"+ extraJs.makeErrorMsg(c, r)+"\n\n[Okay] to try again, or [Cancel] to skip");
+		var retry = confirm("无法编辑草稿页面：\n"+ extraJs.makeErrorMsg(c, r)+"\n\n请选择[重试]或[跳过]");
 		if ( retry ) {
 			getImageInfo();
 		} else {
 			$("#M2D-task1").css({"color":"#F00", "font-weight":""});
-			$("#M2D-status1").html("Skipped");
+			$("#M2D-status1").html("已跳过");
 			editWikitext([]);
 		}
 	} );	
@@ -421,8 +390,8 @@ var editWikitext = function(nonfreefiles) {
 	$("#M2D-status2").html("...");
 
 	var redirectsList = ( !config.pagedata.redirects ) ? '' : '\n'+
-		'<!-- Note: The following pages were redirects to [[' + config.mw.wgPageName +
-		']] before draftification:\n' +
+		'<!-- 注意：以下页面在草稿化前被重定向至[[' + config.mw.wgPageName +
+		']]：\n' +
 		'*[[' + config.pagedata.redirects.join(']]\n*[[') + ']]\n-->\n';
 		
 	var wikitext = "{{subst:AFC draft|" + config.inputdata.authorName + "}}\n" + redirectsList +
@@ -463,17 +432,17 @@ var editWikitext = function(nonfreefiles) {
 
 		// Check for normal file usage, i.e. [[File:Foobar.png|...]]
 		var normal_regex = new RegExp( normal_regex_str, "g");
-		wikitext = wikitext.replace(normal_regex, "<!-- Commented out: $1 -->");
+		wikitext = wikitext.replace(normal_regex, "<!-- 注释： $1 -->");
 		
 		// Check for gallery usage, i.e. instances that must start on a new line, eventually
 		// preceded with some space, and must include File: or Image: prefix
 		var gallery_regex = new RegExp( gallery_regex_str, "mg" );
-		wikitext = wikitext.replace(gallery_regex, "<!-- Commented out: $1 -->");
+		wikitext = wikitext.replace(gallery_regex, "<!-- 注释： $1 -->");
 		
 		// Check for free usages, for example as template argument, might have the File: or Image:
 		// prefix excluded, but must be preceeded by an |
 		var free_regex = new RegExp( free_regex_str, "mg" );
-		wikitext = wikitext.replace(free_regex, "<!-- Commented out: $1 -->");
+		wikitext = wikitext.replace(free_regex, "<!-- 注释：$1 -->");
 	}
 
 	API.postWithToken( 'csrf', {
@@ -484,18 +453,18 @@ var editWikitext = function(nonfreefiles) {
 	} )
 	.done( function(){
 		$("#M2D-task2").css({"color":"#000", "font-weight":""});
-		$("#M2D-status2").html("Done!");
+		$("#M2D-status2").html("完成！");
 		notifyAuthor();
 	} )
 	.fail( function(c,r) {
 		if ( r.textStatus === 'abort' ) { return; }
 		
-		var retry = confirm("Could not edit draft artice:\n"+ extraJs.makeErrorMsg(c, r)+"\n\n[Okay] to try again, or [Cancel] to skip");
+		var retry = confirm("无法编辑草稿页面：\n"+ extraJs.makeErrorMsg(c, r)+"\n\n请选择[重试]或[跳过]");
 		if ( retry ) {
 			editWikitext(nonfreefiles);
 		} else {
 			$("#M2D-task2").css({"color":"#F00", "font-weight":""});
-			$("#M2D-status2").html("Skipped");
+			$("#M2D-status2").html("已跳过");
 			notifyAuthor();
 		}
 	} );
@@ -519,18 +488,18 @@ var notifyAuthor = function() {
 	} )	
 	.done( function(){
 		$("#M2D-task3").css({"color":"#000", "font-weight":""});
-		$("#M2D-status3").html("Done!");
+		$("#M2D-status3").html("完成！");
 		updateTalk();
 	} )
 	.fail( function(c,r) {
 		if ( r.textStatus === 'abort' ) { return; }
 		
-		var retry = confirm("Could not edit author talk page:\n"+ extraJs.makeErrorMsg(c, r)+"\n\n[Okay] to try again, or [Cancel] to skip");
+		var retry = confirm("无法编辑页面创建者讨论页：\n"+ extraJs.makeErrorMsg(c, r)+"\n\n请选择[重试]或[跳过]");
 		if ( retry ) {
 			notifyAuthor();
 		} else {
 			$("#M2D-task3").css({"color":"#F00", "font-weight":""});
-			$("#M2D-status3").html("Skipped");
+			$("#M2D-status3").html("已跳过");
 			updateTalk();
 		}
 	} );
@@ -545,7 +514,7 @@ var updateTalk = function() {
 		var talk_id = result.query.pageids[0];
 		if ( talk_id < 0 ) {
 			$("#M2D-task4").css({"color":"#000", "font-weight":""});
-			$("#M2D-status4").html("Done (talk page does not exist)");
+			$("#M2D-status4").html("已完成（讨论页不存在）");
 			draftifyLog();
 			return;
 		}
@@ -553,7 +522,7 @@ var updateTalk = function() {
 		var new_talk_wikitext = old_talk_wikitext.replace(/(\|\s*(?:class|importance)\s*=\s*)[^\|}]*(?=[^}]*}})/g, "$1");
 		if ( new_talk_wikitext === old_talk_wikitext ) {
 			$("#M2D-task4").css({"color":"#000", "font-weight":""});
-			$("#M2D-status4").html("Done (no changes needed)");
+			$("#M2D-status4").html("已完成（无需更改）");
 			draftifyLog();
 			return;
 		}
@@ -563,22 +532,22 @@ var updateTalk = function() {
 			pageid: talk_id,
 			section: '0',
 			text: new_talk_wikitext,
-			summary: 'Remove class/importance from project banners' + config.script.advert
+			summary: '在专题模板中移除质量和重要度评级' + config.script.advert
 		} )
 		.done( function(){
 			$("#M2D-task4").css({"color":"#000", "font-weight":""});
-			$("#M2D-status4").html("Done!");
+			$("#M2D-status4").html("完成！");
 			draftifyLog();
 		} )
 		.fail( function(c,r) {
 			if ( r.textStatus === 'abort' ) { return; }
 			
-			var retry = confirm("Could not edit draft's talk page:\n"+ extraJs.makeErrorMsg(c, r)+"\n\n[Okay] to try again, or [Cancel] to skip");
+			var retry = confirm("无法编辑草稿的讨论页：\n"+ extraJs.makeErrorMsg(c, r)+"\n\n请选择[重试]或[跳过]");
 			if ( retry ) {
 				updateTalk();
 			} else {
 				$("#M2D-task4").css({"color":"#F00", "font-weight":""});
-				$("#M2D-status4").html("Skipped");
+				$("#M2D-status4").html("已跳过");
 				draftifyLog();
 			}
 		} );		
@@ -598,12 +567,12 @@ var updateTalk = function() {
 	.fail( function(c,r) {
 		if ( r.textStatus === 'abort' ) { return; }
 		
-		var retry = confirm("Could not find draft's talk page:\n"+ extraJs.makeErrorMsg(c, r)+"\n\n[Okay] to try again, or [Cancel] to skip");
+		var retry = confirm("无法找到草稿的讨论页：\n"+ extraJs.makeErrorMsg(c, r)+"\n\n请选择[重试]或[跳过]");
 		if ( retry ) {
 			updateTalk();
 		} else {
 			$("#M2D-task4").css({"color":"#F00", "font-weight":""});
-			$("#M2D-status4").html("Skipped");
+			$("#M2D-status4").html("已跳过");
 			draftifyLog();
 		}
 	} );
@@ -622,7 +591,7 @@ var draftifyLog = function() {
 	var logpage = 'User:' + config.mw.wgUserName + '/Draftify_log';
 	var monthNames = config.mw.wgMonthNames.slice(1);
 	var now = new Date();
-	var heading = '== ' + monthNames[now.getUTCMonth()] + ' ' + now.getUTCFullYear() + ' ==';
+	var heading = '== ' + now.getUTCFullYear() + '年' + monthNames[now.getUTCMonth()] +  ' ==';
 	var headingPatt = RegExp(heading);
 	
 	var processLogWikitext = function(result) {
@@ -630,14 +599,14 @@ var draftifyLog = function() {
 		
 		var id = result.query.pageids[0];
 		if ( id < 0 ) {
-			var createlog = confirm('Log draftification (at ' +  logpage + ') ?');
+			var createlog = confirm('是否要记录草稿化日志（于' +  logpage + '）？');
 			if ( !createlog ) {
 				$("#M2D-task5").css({"color":"#F00", "font-weight":""});
-				$("#M2D-status5").empty().append("Skipped");
+				$("#M2D-status5").empty().append("已跳过");
 				$("#M2D-finished, #M2D-abort").toggle();
 				return;
 			}
-			logpage_wikitext = 'This is a log of pages moved to draftspace using the [[User:Evad37/MoveToDraft|MoveToDraft]] script.'; 
+			logpage_wikitext = '这是该用户使用[[User:94rain/js/MoveToDraft|草稿化脚本]]草稿化的页面列表。'; 
 		} else {
 			logpage_wikitext = result.query.pages[id].revisions[0]['*'].trim();
 		}
@@ -651,22 +620,22 @@ var draftifyLog = function() {
 			action: 'edit',
 			title: logpage,
 			text: logpage_wikitext,
-			summary: 'Logging [['+config.inputdata.newTitle+']]' + config.script.advert
+			summary: '记录对[['+config.inputdata.newTitle+']]的草稿化' + config.script.advert
 		} )	
 		.done( function(){
 			$("#M2D-task5").css({"color":"#000", "font-weight":""});
-			$("#M2D-status5").html("Done!");
+			$("#M2D-status5").html("完成！");
 			$("#M2D-finished, #M2D-abort").toggle();
 		} )
 		.fail( function(c,r) {
 			if ( r.textStatus === 'abort' ) { return; }
 			
-			var retry = confirm("Could not edit log page:\n"+ extraJs.makeErrorMsg(c, r)+"\n\n[Okay] to try again, or [Cancel] to skip");
+			var retry = confirm("无法编辑日志页面：\n"+ extraJs.makeErrorMsg(c, r)+"\n\n请选择[重试]或[跳过]");
 			if ( retry ) {
 				draftifyLog();
 			} else {
 				$("#M2D-task5").css({"color":"#F00", "font-weight":""});
-				$("#M2D-status5").html("Skipped");
+				$("#M2D-status5").html("已跳过");
 				$("#M2D-finished, #M2D-abort").toggle();
 			}
 		} );
@@ -684,12 +653,12 @@ var draftifyLog = function() {
 	.fail( function(c,r) {
 		if ( r.textStatus === 'abort' ) { return; }
 		
-		var retry = confirm("Could not find log page:\n"+ extraJs.makeErrorMsg(c, r)+"\n\n[Okay] to try again, or [Cancel] to skip");
+		var retry = confirm("无法找到日志页面：\n"+ extraJs.makeErrorMsg(c, r)+"\n\n请选择[重试]或[跳过]");
 		if ( retry ) {
 			draftifyLog();
 		} else {
 			$("#M2D-task5").css({"color":"#F00", "font-weight":""});
-			$("#M2D-status5").html("Skipped");
+			$("#M2D-status5").html("已跳过");
 			$("#M2D-finished, #M2D-abort").toggle();
 		}
 	} );
@@ -699,15 +668,15 @@ var draftifyLog = function() {
 //0) Initial screen
 var screen0 = function() {
 	$("#M2D-interface-header, #M2D-interface-content, #M2D-interface-footer").empty();
-	$("#M2D-interface-header").text("Move To Draft...");
-	$("#M2D-interface-content").text("Loading...");
+	$("#M2D-interface-header").text("移动至草稿...");
+	$("#M2D-interface-content").text("记录于日志...");
 	grabPageData();
 };
 
 //1) User inputs
 var screen1 = function() {
 	$("#M2D-interface-header, #M2D-interface-content, #M2D-interface-footer").empty();
-	$("#M2D-interface-header").text("Move To Draft: options");
+	$("#M2D-interface-header").text("移动至草稿：选项");
 	
 	$("#M2D-interface-content").append(
 		$('<div>').css('margin-bottom','0.5em').append(
@@ -720,27 +689,27 @@ var screen1 = function() {
 
 		$('<div>').css('margin-bottom','0.5em').append(
 			$('<label>').attr({'for':'M2D-option-movelog', 'id':'M2D-option-movelog-label'})
-				.css('display','block').text('Move log reason:'),
+				.css('display','block').text('移动原因：'),
 			$('<textarea>').attr({'rows':'1', 'name':'M2D-option-movelog', 'id':'M2D-option-movelog'})
 				.css('width','99%')
 		),
 		
 		$('<div>').css('margin-bottom','0.5em').append(
-			$('<label>').attr({'for':'M2D-option-author', 'id':'M2D-option-author-label'}).text('Author:'),
+			$('<label>').attr({'for':'M2D-option-author', 'id':'M2D-option-author-label'}).text('页面创建者：'),
 			$('<input>').attr({'type':'text', 'name':'M2D-option-author', 'id':'M2D-option-author'})
 		),
 		
 		$('<label>').attr({'for':'M2D-option-message-enable'}).append(
 			$('<input>').attr({'type':'checkbox', 'id':'M2D-option-message-enable'})
 				.prop('checked', true),
-			'Notify author'
+			'通知页面创建者：'
 		),
 		$('<label>').attr({'for':'M2D-option-message-head', 'id':'M2D-option-message-head-label'})
-			.css({'display':'block', 'margin-top':'0.5em'}).text('Notification heading'),
+			.css({'display':'block', 'margin-top':'0.5em'}).text('通知章节标题'),
 		$('<textarea>').attr({'id':'M2D-option-message-head', 'rows':'1'})
 			.css({'width':'99%', 'margin-bottom':'0.5em'}),
 		$('<label>').attr({'for':'M2D-option-message', 'id':'M2D-option-message-label'})
-			.css('display','block').text('Notification message:'),
+			.css('display','block').text('通知消息：'),
 		$('<textarea>').attr({'id':'M2D-option-message', 'rows':'6'})
 			.css('width','99%')
 	);
@@ -758,15 +727,15 @@ var screen1 = function() {
 	});
 	$('#M2D-option-author').val(config.pagedata.author);
 	$('#M2D-option-message-enable').change(function() {
-		$('#M2D-option-message-head').prop('disabled', !this.checked);
-		$('#M2D-option-message').prop('disabled', !this.checked);
+		$('#M2D-option-message-head').prop('已禁用', !this.checked);
+		$('#M2D-option-message').prop('已禁用', !this.checked);
 	});
 	$('#M2D-option-message-head').val(config.wikitext.notification_heading.replace(/\$1/g, getPageText(config.mw.wgPageName)));
 	$('#M2D-option-message').val(config.wikitext.notification.replace(/\$1/g, getPageText(config.mw.wgPageName)));
 	
 	$("#M2D-interface-footer").append(
-		$('<button>').attr('id', 'M2D-next').text('Continue'),
-		$('<button>').attr('id', 'M2D-cancel').css('margin-left','3em').text('Cancel')
+		$('<button>').attr('id', 'M2D-next').text('继续'),
+		$('<button>').attr('id', 'M2D-cancel').css('margin-left','3em').text('取消')
 	);
 
 	$("#M2D-cancel").click(function(){
@@ -791,20 +760,20 @@ var screen1 = function() {
 		//Verify inputs
 		var errors=[];
 		if ( config.inputdata.newTitle.length === 0 ) {
-			errors.push("Invalid draft title");
+			errors.push("目标草稿页无效");
 		}
 		if ( config.inputdata.authorName.length === 0 ) {
-			errors.push("Invalid user name");
+			errors.push("用户名无效");
 		}
 		if ( config.inputdata.rationale.length === 0 ) {
-			errors.push("Move log reason is empty");
+			errors.push("移动原因为空");
 		}
 		if ( config.inputdata.notifyEnable ) {
 			if ( config.inputdata.notifyMsgHead.length === 0 ) {
-				errors.push("Notification heading is empty");
+				errors.push("通知章节标题为空");
 			}
 			if ( config.inputdata.notifyMsg.length === 0 ) {
-				errors.push("Notification message is empty");
+				errors.push("通知消息为空");
 			}
 		}
 		if ( errors.length >= 1 ) {
@@ -821,46 +790,46 @@ var screen1 = function() {
 //2) Progress indicators	
 var screen2 = function() {
 	$("#M2D-interface-header, #M2D-interface-content, #M2D-interface-footer").empty();
-	$("#M2D-interface-header").text("Move To Draft: In progress...");
+	$("#M2D-interface-header").text("移动至草稿：处理中...");
 	$("#M2D-interface-content").append(
 		$('<ul>').attr('id', 'M2D-tasks').css("color", "#888").append(
 			$('<li>').attr('id', 'M2D-task0').append(
 				'Moving page... ',
-				$('<span>').attr('id','M2D-status0').text('waiting')
+				$('<span>').attr('id','M2D-status0').text('等待中')
 			),
 			$('<li>').attr('id', 'M2D-task1').append(
 				'Checking images... ',
-				$('<span>').attr('id','M2D-status1').text('waiting')
+				$('<span>').attr('id','M2D-status1').text('等待中')
 			),	
 			$('<li>').attr('id', 'M2D-task2').append(
 				'Editing page wikitext... ',
-				$('<span>').attr('id','M2D-status2').text('waiting')
+				$('<span>').attr('id','M2D-status2').text('等待中')
 			),
 			config.inputdata.notifyEnable ?
 				$('<li>').attr('id', 'M2D-task3').append(
-					'Notifying author... ',
-					$('<span>').attr('id','M2D-status3').text('waiting')
+					'通知页面创建者...',
+					$('<span>').attr('id','M2D-status3').text('等待中')
 				)
 				: '',
 			$('<li>').attr('id', 'M2D-task4').append(
-				'Updating talk page banners... ',
-				$('<span>').attr('id','M2D-status4').text('waiting')
+				'更新讨论页专题评级模板... ',
+				$('<span>').attr('id','M2D-status4').text('等待中')
 			),
 			
 			$('<li>').attr('id', 'M2D-task5').append(
-				'Logging... ',
+				'记录于日志... ',
 				config.doNotLog
-					? $('<span>').attr('font-size', '90%' ).text('disabled')
-					: $('<span>').attr('id','M2D-status5').text('waiting')
+					? $('<span>').attr('font-size', '90%' ).text('已禁用')
+					: $('<span>').attr('id','M2D-status5').text('等待中')
 			)
 		)
 	);
 	
 	$("#M2D-interface-footer").append(
-		$('<button>').attr('id', 'M2D-abort').text('Abort uncompleted tasks'),
+		$('<button>').attr('id', 'M2D-abort').text('中止未完成操作'),
 		$('<span>').attr('id', 'M2D-finished').hide().append(
-			'Finished!',
-			$('<button>').attr('id', 'M2D-close').text('Close')
+			'全部完成！',
+			$('<button>').attr('id', 'M2D-close').text('关闭')
 		)
 	);
 
@@ -879,7 +848,7 @@ var screen2 = function() {
 };
 
 // --- Add link to 'More' menu (or user-specified portlet) which starts everything ---
-mw.util.addPortletLink( (window.m2d_portlet||'p-cactions'), '#', 'Move to draft', 'ca-m2d', null, null, "#ca-move");
+mw.util.addPortletLink( (window.m2d_portlet||'p-cactions'), '#', '移动至草稿', 'ca-m2d', null, null, "#ca-move");
 $('#ca-m2d').on('click', function(e) {
 	e.preventDefault();
 	// Add interface shell
@@ -969,7 +938,7 @@ function logDraftifications(username, fromDate) {
 		</tr></thead>
 		<tbody></tbody>
 		<tfoot><tr>
-			<td colspan=5 id="draftifyStatus">Loading...</td>
+			<td colspan=5 id="draftifyStatus">加载中...</td>
 		</tr></tfoot>
 		</table>
 		<textarea id="draftifyLogWikitext" disabled="disabled" rows="10">
@@ -1003,7 +972,7 @@ function logDraftifications(username, fromDate) {
 
 	function onLoadMoreClick(e) {
 		e.preventDefault();
-		$('#draftifyStatus').empty().text("Loading...");
+		$('#draftifyStatus').empty().text("加载中...");
 		searchAndShowResults();
 	}
 
@@ -1030,7 +999,7 @@ function logDraftifications(username, fromDate) {
 				// Reset status, add a "Load more" if there are more results
 				$('#draftifyStatus').empty().append(
 					response.continue
-						? $('<a>').css("cursor", "pointer").text('Load more').click(onLoadMoreClick)
+						? $('<a>').css("cursor", "pointer").text('加载更多').click(onLoadMoreClick)
 						: null
 				);
 				// Filter to only MoveToDraft script moves
@@ -1042,7 +1011,7 @@ function logDraftifications(username, fromDate) {
 				switch(true) {
 					case noDraftifyEvents && !response.continue:
 						$('#draftifyStatus').empty().text(
-							$('#draftifyLog tbody tr').length == 0 ? "No results" : "No further results"
+							$('#draftifyLog tbody tr').length == 0 ? "无结果" : "无更多结果"
 						);
 						break;
 					case noDraftifyEvents:
@@ -1051,7 +1020,7 @@ function logDraftifications(username, fromDate) {
 						searchAndShowResults();
 						break;
 					case !response.continue:
-						$('#draftifyStatus').empty().text("No further results");
+						$('#draftifyStatus').empty().text("无更多结果");
 						/* falls through */
 					default:
 						draftifyEvents.forEach(function(logevent) {
@@ -1089,14 +1058,14 @@ function logDraftifications(username, fromDate) {
 var isDraftifyLogPage = config.mw.wgPageName.indexOf("Special:Draftify_log") === 0;
 var isUserPage = config.mw.wgNamespaceNumber === 2 || config.mw.wgNamespaceNumber === 3;
 if (isDraftifyLogPage) {
-	document.title = "Draftify log - Wikipedia"
+	document.title = "Draftify log - 维基百科"
 	$('h1').text("Draftify log");
 	$('#mw-content-text').empty()
 	.text("Loading...")
 	.before(
 		$('<span>').append(
 			'Note: This page only works with the ',
-			$('<a>').attr('href','/wiki/User:Evad37/MoveToDraft').text('MoveToDraft'),
+			$('<a>').attr('href','/wiki/User:94rain/js/MoveToDraft').text('MoveToDraft'),
 			' userscript installed.'
 		),
 		$('<hr>')

@@ -35,13 +35,13 @@ window.extraJs = { version: '2.1.6' };
 extraJs.makeErrorMsg = function(code, jqxhr) {
 	var details = '';
 	if ( code === 'http' && jqxhr.textStatus === 'error' ) {
-		details = 'HTTP error ' + jqxhr.xhr.status;
+		details = 'HTTP错误' + jqxhr.xhr.status;
 	} else if ( code === 'http' ) {
-		details = 'HTTP error: ' + jqxhr.textStatus;
+		details = 'HTTP错误: ' + jqxhr.textStatus;
 	} else if ( code === 'ok-but-empty' ) {
-		details = 'Error: Got an empty response from the server';
+		details = '错误：来自服务器的响应为空';
 	} else {
-		details = 'API error: ' + code;
+		details = 'API错误：' + code;
 	}
 	return details;
 };
@@ -63,7 +63,7 @@ extraJs.makeLink = function(linktarget, linktext) {
 		linktext = linktarget;
 	}
 	return $('<a>').attr({
-		'href':'https://en.wikipedia.org/wiki/'+mw.util.wikiUrlencode(linktarget),
+		'href':'https://zh.wikipedia.org/wiki/'+mw.util.wikiUrlencode(linktarget),
 		'target':'_blank'
 	}).text(linktext);
 };
