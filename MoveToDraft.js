@@ -1,7 +1,7 @@
 ﻿/***************************************************************************************************
  MoveToDraft
 -------------
-Version 2.4.2
+Version 2.4.3
 -------------
 A script to move unsourced articles to draft space, including cleanup and author notification.
 - Moves page to draftspace
@@ -266,10 +266,10 @@ var grabPageData = function() {
 		} );
 	};
 	doRedirectsQuery(redirectsQuery);
-	
+	checkPageData();
+};
 	/* ---------- Review (Page Triage) status ----------------------------------------------------------------- */
 
-	checkPageData();
 //Move page
 var movePage = function() {
 	$("#M2D-task0").css({"color":"#00F", "font-weight":"bold"});
@@ -681,7 +681,7 @@ var screen1 = function() {
 	$("#M2D-interface-content").append(
 		$('<div>').css('margin-bottom','0.5em').append(
 			$('<label>').attr('for','M2D-option-newtitle').append(
-				'Move to ',
+				'移动至',
 				$('<b>').text('Draft:')
 			),
 			$('<input>').attr({'type':'text', 'name':'M2D-option-newtitle', 'id':'M2D-option-newtitle'})
@@ -702,7 +702,7 @@ var screen1 = function() {
 		$('<label>').attr({'for':'M2D-option-message-enable'}).append(
 			$('<input>').attr({'type':'checkbox', 'id':'M2D-option-message-enable'})
 				.prop('checked', true),
-			'通知页面创建者：'
+			'通知页面创建者'
 		),
 		$('<label>').attr({'for':'M2D-option-message-head', 'id':'M2D-option-message-head-label'})
 			.css({'display':'block', 'margin-top':'0.5em'}).text('通知章节标题'),
@@ -907,7 +907,7 @@ function logDraftifications(username, fromDate) {
 	$('#mw-content-text').append(
 		$(`<form id='draftifyLogForm' style='border: 1px solid #ccc; margin: 1em 0; padding: 0 0.5em;'>
 			<div style="display:inline-block;padding:0.5em">
-				<label for="draftifyUsername">User:</label>
+				<label for="draftifyUsername">用户:</label>
 				<input type="text" name="username" id="draftifyUsername" />
 			</div>
 			<div style="display:inline-block;padding:0.5em">
@@ -930,11 +930,11 @@ function logDraftifications(username, fromDate) {
 	$('#mw-content-text').append(
 		$(`<table id='draftifyLog' class='wikitable sortable' style='width:100%'>
 		<thead><tr>
-			<th scope='col'>From</th>
-			<th scope='col'>To</th>
-			<th scope='col'>Time</th>
-			<th scope='col'>User</th>
-			<th scope='col'>Reason</th>
+			<th scope='col'>从</th>
+			<th scope='col'>至</th>
+			<th scope='col'>时间</th>
+			<th scope='col'>用户</th>
+			<th scope='col'>原因</th>
 		</tr></thead>
 		<tbody></tbody>
 		<tfoot><tr>
@@ -947,11 +947,11 @@ function logDraftifications(username, fromDate) {
 
 	$('#draftifyLogWikitext').val(`{|class="wikitable"
 |-
-!scope='col'|From
-!scope='col'|To
-!scope='col'|Time
-!scope='col'|User
-!scope='col'|Reason
+!scope='col'|从
+!scope='col'|至
+!scope='col'|时间
+!scope='col'|用户
+!scope='col'|原因
 |}`);
 
 	var query = {
@@ -1064,9 +1064,9 @@ if (isDraftifyLogPage) {
 	.text("Loading...")
 	.before(
 		$('<span>').append(
-			'Note: This page only works with the ',
+			'注意：此页面仅在安装',
 			$('<a>').attr('href','/wiki/User:94rain/js/MoveToDraft').text('MoveToDraft'),
-			' userscript installed.'
+			'后可见。'
 		),
 		$('<hr>')
 	);
