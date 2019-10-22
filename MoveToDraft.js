@@ -1,7 +1,7 @@
 /***************************************************************************************************
  MoveToDraft
 -------------
-Version 2.4.2
+Version 2.4.3
 -------------
 A script to move unsourced articles to draft space, including cleanup and author notification.
 - Moves page to draftspace
@@ -16,7 +16,7 @@ A script to move unsourced articles to draft space, including cleanup and author
 // <nowiki>
 $.when(
 	// Resource loader modules
-	mw.loader.using(['mediawiki.util', 'mediawiki.api', 'mediawiki.Title', 'mediawiki.RegExp']),
+	mw.loader.using(['mediawiki.util', 'mediawiki.api', 'mediawiki.Title']),
 	// Page ready
 	$.ready
 ).then(function() {
@@ -25,7 +25,7 @@ var config = {
 	// Script info
 	script: {
 		advert:  ' ([[User:Evad37/MoveToDraft.js|via script]])', // For edit summaries
-		version: '2.4.2'
+		version: '2.4.3'
 	},
 	// MediaWiki configuration values
 	mw: mw.config.get( [
@@ -292,7 +292,7 @@ var grabPageData = function() {
 		if ( r.textStatus === 'abort' ) { return; }
 		
 		API.abort();
-		var retry = confirm("Could not retrieve page wikitext:\n"+ extraJs.makeErrorMsg(c, r)+"\n\nTry again?");
+		var retry = confirm("Could not retrieve page triage status:\n"+ extraJs.makeErrorMsg(c, r)+"\n\nTry again?");
 		if ( retry ) {
 			screen0();
 		} else {
@@ -440,9 +440,9 @@ var editWikitext = function(nonfreefiles) {
 			filename = nonfreefiles[i].replace(/^.*?:/, "");
 			// For regex matching: first character can be either upper or lower case, special
 			// characters need to be escaped, spaces can be either spaces or underscores
-			filename_regex_str = "[" + mw.RegExp.escape(filename.slice(0, 1).toUpperCase()) +
-			mw.RegExp.escape(filename.slice(0, 1).toLowerCase()) + "]" +
-			mw.RegExp.escape(filename.slice(1)).replace(/ /g, "[ _]");
+			filename_regex_str = "[" + mw.util.escapeRegExp(filename.slice(0, 1).toUpperCase()) +
+			mw.util.escapeRegExp(filename.slice(0, 1).toLowerCase()) + "]" +
+			mw.util.escapeRegExp(filename.slice(1)).replace(/ /g, "[ _]");
 			// Add to regex strings
 			normal_regex_str += "\\[\\[\\s*(?:[Ii]mage|[Ff]ile)\\s*:\\s*" + filename_regex_str +
 			"\\s*\\|?.*?(?:(?:\\[\\[.*?\\]\\]).*?)*\\]\\]";
@@ -1120,7 +1120,7 @@ if ( config.mw.wgCurRevisionId === 0 ) {
 
 // Load extra.js if not already available
 if ( window.extraJs == null ) {
-	importScript('User:Evad37/extra.js');
+	importScript('User:94rain/js/Draft-extra.js');
 }
 moveToDraft();
 
