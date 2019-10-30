@@ -911,7 +911,7 @@ function logDraftifications(username, fromDate) {
 				<input type="text" name="username" id="draftifyUsername" />
 			</div>
 			<div style="display:inline-block;padding:0.5em">
-				<label for="draftifyFromDate">From date (and earlier)</label>
+				<label for="draftifyFromDate">最晚截至</label>
 				<input type="date" id="draftifyFromDate" name="fromDate" value="${fromDate || today}" />
 			</div>
 			<div style="display:inline-block;padding:0.5em">
@@ -1026,7 +1026,7 @@ function logDraftifications(username, fromDate) {
 						draftifyEvents.forEach(function(logevent) {
 							var fromTitle = logevent.title;
 							var toTitle = logevent.params.target_title;
-							var timeOfMove = new Date(logevent.timestamp).toUTCString().replace("GMT", "(UTC)");
+							var timeOfMove = new Date(logevent.timestamp).toLocaleString().replace("GMT", "(UTC)");
 							var user = logevent.user;
 							var comment = logevent.comment;
 							var wikitext = $('#draftifyLogWikitext').val().replace("|}", `|-
