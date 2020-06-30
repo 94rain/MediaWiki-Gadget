@@ -1,18 +1,11 @@
-﻿/***************************************************************************************************
- MoveToDraft
--------------
-Version 2.4.3
--------------
-A script to move unsourced articles to draft space, including cleanup and author notification.
-- Moves page to draftspace
-- Checks if any files used are non-free
-- Checks if any redirects pointed to the page
-- Comments out non-free files, turn categories into links, add afc draft template, add redirects
-- Adds notification message on author talk page
-- Updates talk page banners
-- Logs draftification in user subpage
-
-***************************************************************************************************/
+﻿/**
+ * Forked https://en.wikipedia.org/wiki/User:Evad37/MoveToDraft.js
+ * @name MoveToDraft
+ * @see [[User:94rain/js/MoveToDraft]]
+ * @version 2.4.3
+ * @author [[User:Evad37]]
+ * @author [[User:94rain]]
+ */
 // <nowiki>
 $.when(
 	// Resource loader modules
@@ -55,11 +48,11 @@ var moveToDraft = function moveToDraft() {
 /* ========== Additional config ================================================================= */
 // Wikitext strings
 config.wikitext = {
-	'rationale':	window.m2d_rationale || '无来源或内容短小，在草稿空间改善',
-	'editsummary':	window.m2d_editsummary || window.m2d_rationale || '[[:WP:AFC|建立条目]]草稿',
-	'notification_heading': '通知：[[:Draft:$1|$1]]移动至草稿空间',
-	'notification':	window.m2d_notification || "您最近创建的条目[[:Draft:$1|$1]]没有足够的[[:WP:V|来源]]和[[:Help:脚注|脚注]]，或者还未完成。维基百科的条目需要[[WP:RS|可靠来源]]来彰显其有足够的关注度。因此，我已经将它移动到了草稿（在条目名前有一个\"<code>Draft:</code>\"前缀）)。您可以慢慢改善它，若您认为它满足[[:WP:GNG|通用关注度指引]]并且可以成为一篇维基百科的条目时，请点击页面顶部的\"提交草稿\"以待有经验的编者审核并将其移动到条目空间。--~~~~",
-	'logMsg':		'#[[:$1]]移动至[[$2]]，于~~~~~'
+	'rationale':	window.m2d_rationale || wgULS('无来源或内容短小，在草稿空间改善','無來源或內容短小，在草稿空間改善'),
+	'editsummary':	window.m2d_editsummary || window.m2d_rationale || wgULS('[[:WP:AFC|建立条目]]草稿','[[:WP:AFC|建立條目]]草稿'),
+	'notification_heading': wgULS('通知：[[:Draft:$1|$1]]移动至草稿空间','通知：[[:Draft:$1|$1]]移動至草稿空間'),
+	'notification':	window.m2d_notification || wgULS("您最近创建的条目[[:Draft:$1|$1]]没有足够的[[:WP:V|来源]]和[[:Help:脚注|脚注]]，或者还未完成。维基百科的条目需要[[WP:RS|可靠来源]]来彰显其有足够的关注度。因此，我已经将它移动到了草稿（在条目名前有一个\"<code>Draft:</code>\"前缀）)。您可以慢慢改善它，若您认为它满足[[:WP:GNG|通用关注度指引]]并且可以成为一篇维基百科的条目时，请点击页面顶部的\"提交草稿\"以待有经验的编者审核并将其移动到条目空间。--~~~~","您最近創建的條目[[:Draft:$1|$1]]沒有足夠的[[:WP:V|來源]]和[[:Help:腳註|腳註]]，或者還未完成。維基百科的條目需要[[WP:RS|可靠來源]]來彰顯其有足夠的關注度。因此，我已經將它移動到了草稿（在條目名前有一個\"<code>Draft:</code>\"前綴）)。您可以慢慢改善它，若您認為它滿足[[:WP:GNG|通用關注度指引]]並且可以成為一篇維基百科的條目時，請點擊頁面頂部的\"提交草稿\"以待有經驗的編者審核並將其移動到條目空間。 --~~~~"),
+	'logMsg':		wgULS('#[[:$1]]移动至[[$2]]，于~~~~~', '#[[:$1]]移動至[[$2]]，於~~~~~')
 };
 config.doNotLog = window.m2d_doNotLog ? true : false;
 // Page data -- to be retreived later from api
