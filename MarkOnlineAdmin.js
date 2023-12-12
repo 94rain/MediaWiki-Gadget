@@ -9,15 +9,17 @@
  * 4. 等DOM完成再执行
  */
 
-(function($, mw) {
+(function(window, document, $) {
     $(function() {
+        var conv = require('ext.gadget.HanAssist').conv;
+
         var BLACKLIST = ['Xiplus-abot'];
 
         // Create portlet link
         var portletLinkOnline = mw.util.addPortletLink(
                 'p-cactions',
                 '#',
-                wgULS('在线管理人员', '線上管理人員'));
+                conv({ hans: '在线管理人员', hant: '線上管理人員' }));
 
         var rcstart,
             rcend,
@@ -124,8 +126,6 @@
                         admins = admins.filter(filter);
                         iadmins = iadmins.filter(filter);
                         bureaucrats = bureaucrats.filter(filter);
-                        oversighters = oversighters.filter(filter);
-                        checkusers = checkusers.filter(filter);
 
                         var userlink = function(user) {
                             var user2 = user.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&lt;');
@@ -133,54 +133,55 @@
                         }
 
                         if (admins.length + iadmins.length + bureaucrats.length + oversighters.length + checkusers.length > 0) {
-                            var adminsstring = [wgULS('<p>下面是最近30分钟之内在线的管理人员</p>', '<p>下面是最近30分鐘內的線上管理人員</p>')];
-
+                            var adminsstring = [conv({ hans: '<p>下面是最近30分钟之内在线的管理人员</p>', hant: '<p>下面是最近30分鐘內的線上管理人員</p>' })];
+                        
                             if (admins.length > 0) {
-                                adminsstring.push('<p style="word-break:break-all;">' + wgULS('管理员', '管理員') + ' (' + admins.length + wgULS('个在线', '個在線') + ')：');
+                                adminsstring.push('<p style="word-break:break-all;">' + conv({ hans: '管理员', hant: '管理員' }) + ' (' + admins.length + conv({ hans: '个在线', hant: '個在線' }) + ')：');
                                 $.each(admins, function(i, e) {
                                     adminsstring.push(userlink(e));
                                 });
                                 adminsstring.push('</p>');
                             }
-
+                        
                             if (iadmins.length > 0) {
-                                adminsstring.push('<p style="word-break:break-all;">' + wgULS('界面管理员', '介面管理員') + ' (' + iadmins.length + wgULS('个在线', '個在線') + ')：');
+                                adminsstring.push('<p style="word-break:break-all;">' + conv({ hans: '界面管理员', hant: '介面管理員' }) + ' (' + iadmins.length + conv({ hans: '个在线', hant: '個在線' }) + ')：');
                                 $.each(iadmins, function(i, e) {
                                     adminsstring.push(userlink(e));
                                 });
                                 adminsstring.push('</p>');
                             }
-
+                        
                             if (bureaucrats.length > 0) {
-                                adminsstring.push('<p style="word-break:break-all;">' + wgULS('行政员', '行政員') + ' (' + bureaucrats.length + wgULS('个在线', '個在線') + ')：');
+                                adminsstring.push('<p style="word-break:break-all;">' + conv({ hans: '行政员', hant: '行政員' }) + ' (' + bureaucrats.length + conv({ hans: '个在线', hant: '個在線' }) + ')：');
                                 $.each(bureaucrats, function(i, e) {
                                     adminsstring.push(userlink(e));
                                 });
                                 adminsstring.push('</p>');
                             }
-
+                        
                             if (oversighters.length > 0) {
-                                adminsstring.push('<p style="word-break:break-all;">' + wgULS('监督员', '監督員') + ' (' + oversighters.length + wgULS('个在线', '個在線') + ')：');
+                                adminsstring.push('<p style="word-break:break-all;">' + conv({ hans: '监督员', hant: '監督員' }) + ' (' + oversighters.length + conv({ hans: '个在线', hant: '個在線' }) + ')：');
                                 $.each(oversighters, function(i, e) {
                                     adminsstring.push(userlink(e));
                                 });
                                 adminsstring.push('</p>');
                             }
-
+                        
                             if (checkusers.length > 0) {
-                                adminsstring.push('<p style="word-break:break-all;">' + wgULS('用户查核员', '用戶查核員') + ' (' + checkusers.length + wgULS('个在线', '個在線') + ')：');
+                                adminsstring.push('<p style="word-break:break-all;">' + conv({ hans: '用户查核员', hant: '用戶查核員' }) + ' (' + checkusers.length + conv({ hans: '个在线', hant: '個在線' }) + ')：');
                                 $.each(checkusers, function(i, e) {
                                     adminsstring.push(userlink(e));
                                 });
                                 adminsstring.push('</p>');
                             }
-
+                        
                             mw.notify($(adminsstring.join('')));
                         } else {
-                            mw.notify(wgULS('目前没有管理人员在线。', '目前沒有管理人員在線。'));
+                            mw.notify(conv({ hans: '目前没有管理人员在线。', hant: '目前沒有管理人員在線。' }));
                         }
+                        
                     }).fail(function() {
-                        mw.notify(wgULS('查询时发生错误，请稍后重试。', '查詢時發生錯誤，請稍後重試。'));
+                        mw.notify(conv({ hans: '查询时发生错误，请稍后重试。', hant: '查詢時發生錯誤，請稍後重試。'}));
                     });
                 });
             });
