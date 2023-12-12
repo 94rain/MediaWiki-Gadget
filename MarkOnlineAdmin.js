@@ -24,8 +24,10 @@
             time;
         var users = [];
         var admins = [],
-            rollbackers = [],
-            patrollers = [];
+            iadmins = [],
+            bureaucrats = [],
+            oversighters = [],
+            checkusers = [];
         var api = new mw.Api();
 
         // Bind click handler
@@ -35,8 +37,10 @@
             users = [];
             var usersExt = [];
             admins = [];
-            rollbackers = [];
-            patrollers = [];
+            iadmins = [];
+            bureaucrats = [],
+            oversighters = [],
+            checkusers = [];
 
             // 最近更改30分钟内的编辑用户
             time = new Date();
@@ -84,11 +88,18 @@
                                 if ($.inArray('sysop', user.groups) > -1) {
                                     admins[i] = user.name;
                                 }
-                                if ($.inArray('rollbacker', user.groups) > -1) {
-                                    rollbackers[i] = user.name;
+                                if ($.inArray('interface-admin', user.groups) > -1) {
+                                    iadmins[i] = user.name;
                                 }
-                                if ($.inArray('patroller', user.groups) > -1) {
-                                    patrollers[i] = user.name;
+                                if ($.inArray('bureaucrat', user.groups) > -1) {
+                                    bureaucrats[i] = user.name;
+                                }
+                                // 监督员权限为suppress，但持有用户称为oversighter
+                                if ($.inArray('suppress', user.groups) > -1) {
+                                    oversighters[i] = user.name;
+                                }
+                                if ($.inArray('checkuser', user.groups) > -1) {
+                                    checkusers[i] = user.name;
                                 }
                             }
                         });
@@ -111,15 +122,17 @@
                         };
 
                         admins = admins.filter(filter);
-                        rollbackers = rollbackers.filter(filter);
-                        patrollers = patrollers.filter(filter);
+                        iadmins = iadmins.filter(filter);
+                        bureaucrats = bureaucrats.filter(filter);
+                        oversighters = oversighters.filter(filter);
+                        checkusers = checkusers.filter(filter);
 
                         var userlink = function(user) {
                             var user2 = user.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&lt;');
                             return '<a href="/wiki/User:' + user2 + '" target="_blank">' + user2 + '</a>&nbsp;<small style="opacity:.75;">(<a href="/wiki/User talk:' + user2 + '" target="_blank">留言</a>)</small>　';
                         }
 
-                        if (admins.length + rollbackers.length + patrollers.length > 0) {
+                        if (admins.length + iadmins.length + bureaucrats.length + oversighters.length + checkusers.length > 0) {
                             var adminsstring = [wgULS('<p>下面是最近30分钟之内在线的管理人员</p>', '<p>下面是最近30分鐘內的線上管理人員</p>')];
 
                             if (admins.length > 0) {
@@ -130,17 +143,33 @@
                                 adminsstring.push('</p>');
                             }
 
-                            if (patrollers.length > 0) {
-                                adminsstring.push('<p style="word-break:break-all;">' + wgULS('巡查员', '巡查員') + ' (' + patrollers.length + wgULS('个在线', '個在線') + ')：');
-                                $.each(patrollers, function(i, e) {
+                            if (iadmins.length > 0) {
+                                adminsstring.push('<p style="word-break:break-all;">' + wgULS('界面管理员', '介面管理員') + ' (' + iadmins.length + wgULS('个在线', '個在線') + ')：');
+                                $.each(iadmins, function(i, e) {
                                     adminsstring.push(userlink(e));
                                 });
                                 adminsstring.push('</p>');
                             }
 
-                            if (rollbackers.length > 0) {
-                                adminsstring.push('<p style="word-break:break-all;">' + wgULS('回退员', '回退員') + ' (' + rollbackers.length + wgULS('个在线', '個在線') + ')：');
-                                $.each(rollbackers, function(i, e) {
+                            if (bureaucrats.length > 0) {
+                                adminsstring.push('<p style="word-break:break-all;">' + wgULS('行政员', '行政員') + ' (' + bureaucrats.length + wgULS('个在线', '個在線') + ')：');
+                                $.each(bureaucrats, function(i, e) {
+                                    adminsstring.push(userlink(e));
+                                });
+                                adminsstring.push('</p>');
+                            }
+
+                            if (oversighters.length > 0) {
+                                adminsstring.push('<p style="word-break:break-all;">' + wgULS('监督员', '監督員') + ' (' + oversighters.length + wgULS('个在线', '個在線') + ')：');
+                                $.each(oversighters, function(i, e) {
+                                    adminsstring.push(userlink(e));
+                                });
+                                adminsstring.push('</p>');
+                            }
+
+                            if (checkusers.length > 0) {
+                                adminsstring.push('<p style="word-break:break-all;">' + wgULS('用户查核员', '用戶查核員') + ' (' + checkusers.length + wgULS('个在线', '個在線') + ')：');
+                                $.each(checkusers, function(i, e) {
                                     adminsstring.push(userlink(e));
                                 });
                                 adminsstring.push('</p>');
